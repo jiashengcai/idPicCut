@@ -19,7 +19,7 @@ import net.coobird.thumbnailator.Thumbnails;
 // Detects faces in an image, draws boxes around them, and writes the results
 // to "faceDetection.png".
 //
-public class DetectFaceDemo {
+public class Main {
 	private static String url="D:/image";
 	private static String saveUrl="D:/image/newimage/";
 	
