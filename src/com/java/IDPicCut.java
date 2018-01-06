@@ -13,15 +13,30 @@ import org.opencv.core.MatOfRect;
 import org.opencv.core.Rect;
 import org.opencv.highgui.Highgui;
 import org.opencv.objdetect.CascadeClassifier;
-
 import net.coobird.thumbnailator.Thumbnails;
-public class Main {
-	private static String url="D:/image";
-	private static String saveUrl="D:/image/newimage/";
+public class IDPicCut {
+	//文件打开路径
+	private String fileUrl="D:/image";
+	//文件保存路径
+	private  String saveUrl;
+	public String getSaveUrl() {
+		return saveUrl;
+	}
+
+	public void setSaveUrl(String saveUrl) {
+		this.saveUrl = saveUrl;
+	}
+
+	public IDPicCut(String savePath) {
+		this.saveUrl=savePath;
+	}
 	
+	public IDPicCut() {
+	}
+
 	public void run() {
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);  
-    File dir = new File(url);
+    File dir = new File(fileUrl);
     /**
      * 读取图片路径
      */
@@ -88,8 +103,7 @@ public class Main {
  * 1f表示尺寸不变 0.25f表示质量进行压缩
  * @param file
  */
-	private void smartData(File file) {
-		
+	public void smallPic(File file) {
 		if (file.length() > 1000000) {
 			try {
 				Thumbnails.of(file).scale(1f).outputQuality(0.8f).toFile(file);
@@ -104,7 +118,7 @@ public class Main {
 	 * 换底色
 	 * @param file
 	 */
-	private void setBGC(File image) {
+	public void setBGC(File  image) {
         BufferedImage bi = null;  
         try {  
             /** 
@@ -256,7 +270,6 @@ public class Main {
         rgb[0] = (pixel & 0xff0000) >> 16;  
         rgb[1] = (pixel & 0xff00) >> 8;  
         rgb[2] = (pixel & 0xff);  
-        
         /** 
          * 进行换色操作，我这里是要把蓝底换成白底，那么就判断图片中rgb值是否在蓝色范围的像素 
          */  
@@ -265,8 +278,11 @@ public class Main {
         }
 		return false;
 	}
-	//图片处理
-	private void dealImage(File file) {
+	/**
+	 * 图片处理
+	 * @param file
+	 */
+	public void dealImage(File file) {
 		Rect face=detectFace(file);
 		
 		//Core.rectangle(face, new Point(MaxRect.x, MaxRect.y), new Point(MaxRect.x + MaxRect.width, MaxRect.y + MaxRect.height), new Scalar(0, 255, 0));
