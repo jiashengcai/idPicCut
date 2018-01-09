@@ -10,8 +10,8 @@ import org.opencv.highgui.Highgui;
 import org.opencv.imgproc.Imgproc;
 
 class BeautyFace{
-	private static String saveUrl="D:/image/bak";
-	public void run() {
+	private static String saveUrl="D:/newimage";
+	public static void main(String[] args) {
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);  
 		File dir = new File(saveUrl);
 	    /**
@@ -43,7 +43,6 @@ class BeautyFace{
 	}
 	public static Mat face2(Mat image) {  
 	    Mat dst = new Mat();  
-	  
 	    // int value1 = 3, value2 = 1; 磨皮程度与细节程度的确定  
 	    int value1 = 3, value2 = 3;   
 	    int dx = value1 * 5; // 双边滤波参数之一  
@@ -71,6 +70,5 @@ class BeautyFace{
 	      
 	    Core.add(dst, new Scalar(10, 10, 10), dst);  
 	    return dst;  
-	  
 	}  
 }

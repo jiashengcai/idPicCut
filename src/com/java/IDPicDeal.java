@@ -11,100 +11,80 @@ import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfRect;
 import org.opencv.core.Rect;
+import org.opencv.core.Scalar;
+import org.opencv.core.Size;
 import org.opencv.highgui.Highgui;
+import org.opencv.imgproc.Imgproc;
 import org.opencv.objdetect.CascadeClassifier;
 
 import net.coobird.thumbnailator.Thumbnails;
-public class Main {
-	private static String url="D:/image";
-	private static String saveUrl="D:/image/newimage/";
-	
-	public void run() {
-		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);  
-    File dir = new File(url);
-    /**
-     * 读取图片路径
-     */
-	File[] images=dir.listFiles(new FilenameFilter() {
-		@Override
-		//重写文件判断方法 只读取后缀为.jpg的照片
-		public boolean accept(File dir, String name) {
-			if (name.length()>4&&name.substring(name.length()-4, name.length()).equalsIgnoreCase(".jpg")) {
-				return true;
-			}
-			return false;
-		}
-	});
-	
-	
+public class IDPicDeal {
+
+	/**
+	 * 人脸美化
+	 */
+	public void beautFace(File image) {
+		Mat src2 = Highgui.imread(image.getPath());
+        Mat src3 = face(src2);  
+        
+        Mat dest = new Mat(new Size(src2.cols()+src3.cols(), src2.rows()), src2.type());  
+        Mat temp1 = dest.colRange(0, src2.cols());  
+        Mat temp2 = dest.colRange(src2.cols(), dest.cols());  
+        src2.copyTo(temp1);  
+        //src3.copyTo(temp2);  
+        Highgui.imwrite("D:/newImage/"+image.getName(), src3);
+        System.out.println(image.getName());
+	}
+	public  Mat face(Mat image) {  
+	    Mat dst = new Mat();  
+	    // int value1 = 3, value2 = 1; 磨皮程度与细节程度的确定  
+	    int value1 = 3, value2 = 3;   
+	    int dx = value1 * 5; // 双边滤波参数之一  
+	    double fc = value1 * 12.5; // 双边滤波参数之一  
+	    double p = 0.1f; // 透明度  
+	    Mat temp1 = new Mat(), temp2 = new Mat(), temp3 = new Mat(), temp4 = new Mat();  
+	  
+	    // 双边滤波  
+	    Imgproc.bilateralFilter(image, temp1, dx, fc, fc);  
+	  
+	    // temp2 = (temp1 - image + 128);  
+	    Mat temp22 = new Mat();  
+	    Core.subtract(temp1, image, temp22);  
+	    // Core.subtract(temp22, new Scalar(128), temp2);  
+	    Core.add(temp22, new Scalar(128, 128, 128, 128), temp2);  
+	    // 高斯模糊  
+	    Imgproc.GaussianBlur(temp2, temp3, new Size(2 * value2 - 1, 2 * value2 - 1), 0, 0);  
+	  
+	    // temp4 = image + 2 * temp3 - 255;  
+	    Mat temp44 = new Mat();  
+	    temp3.convertTo(temp44, temp3.type(), 2, -255);  
+	    Core.add(image, temp44, temp4);  
+	    // dst = (image*(100 - p) + temp4*p) / 100;  
+	    Core.addWeighted(image, p, temp4, 1 - p, 0.0, dst);  
+	      
+	    Core.add(dst, new Scalar(10, 10, 10), dst);  
+	    return dst;  
+	}
 	
 	/**
-	 * 压缩
-	 * 人脸识别+剪裁
+	 * 压缩图片
+	 * 
+	 * @param file 图片文件
+	 * @param size 压缩比例
 	 */
-	for (File file : images) {
-		//smartData(file);
-		if (file.length() > 1000000) {
-			try {
-				Thumbnails.of(file).scale(1f).outputQuality(0.8f).toFile(file);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+	private void smartData(File file,Float size) {
+		try {
+			Thumbnails.of(file).scale(1f).outputQuality(size).toFile(file);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-		//dealImage(file);
 	}
 	
-	
-	File dirNew=new File(saveUrl);
-	File[] newImages=dirNew.listFiles(new FilenameFilter() {
-		@Override
-		public boolean accept(File dir, String name) {
-			//只读取jpg文件
-			if (name.length()>4&&name.substring(name.length()-4, name.length()).equalsIgnoreCase(".jpg")) {
-				return true;
-			}
-			return false;
-		}
-	});
-	
-	for (File file : newImages) {
-			//
-			try {
-				// 一寸
-				Thumbnails.of(file).size(259, 413).keepAspectRatio(true).toFile(file);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			setBGC(file);
-		}
-
-	}
-
-/**
- * 压缩图片
- * 如果文件大于1m就进行压缩
- * 1f表示尺寸不变 0.25f表示质量进行压缩
- * @param file
- */
-	private void smartData(File file) {
-		
-		if (file.length() > 1000000) {
-			try {
-				Thumbnails.of(file).scale(1f).outputQuality(0.8f).toFile(file);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-
-	}
 	/**
-	 * 换底色
-	 * @param file
+	 * @param file 传入照片文件进行图像换底色
+	 * @param url 保存路径
 	 */
-	private void setBGC(File image) {
+	public void setBGC(File image,String url) {
         BufferedImage bi = null;  
         try {  
             /** 
@@ -244,7 +224,7 @@ public class Main {
 	}
 	
 	/**
-	 * 颜色判断
+	 * 底色判断
 	 * @param file
 	 */
 	private boolean isWhite(BufferedImage image,int i,int j) {
@@ -265,8 +245,13 @@ public class Main {
         }
 		return false;
 	}
-	//图片处理
-	private void dealImage(File file) {
+	
+	/**
+	 * 传入照片文件
+	 * 对图像进行人脸识别剪切
+	 * @param file
+	 */
+	public void dealImage(File file,String url) {
 		Rect face=detectFace(file);
 		
 		//Core.rectangle(face, new Point(MaxRect.x, MaxRect.y), new Point(MaxRect.x + MaxRect.width, MaxRect.y + MaxRect.height), new Scalar(0, 255, 0));
@@ -274,14 +259,11 @@ public class Main {
 	    try {
 			Thumbnails.of(file).sourceRegion((int) (face.x - face.width * 0.4),
 					(int) (face.y - face.height * 0.6),
-					(int) (face.width * 1.8), (int) (face.height * 2.4)).scale(1f).toFile(saveUrl+file.getName());
+					(int) (face.width * 1.8), (int) (face.height * 2.4)).scale(1f).toFile(url+file.getName());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	    
-	    
-	    
 	}
 	/**
 	 * 人脸识别 ，并返回最大的人脸
