@@ -12,6 +12,7 @@ public class Test {
 	private static String url="D:/image";
 	private static String saveUrl="D:/image/newimage/";
 	public static void main(String[] args) {
+<<<<<<< HEAD
 		IDPicDeal test=new IDPicDeal();
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);  
 	    File dir = new File(url);
@@ -76,4 +77,9 @@ public class Test {
 		}
 		//new BeautyFace().run();
 	
+=======
+		IDPicCut idPicCut=new IDPicCut();
+		new BeautyFace().run();
+	}
+>>>>>>> 8c9dec95621728ed42bc64cfd89ad4b9fdc31a99
 }
