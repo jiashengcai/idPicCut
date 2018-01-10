@@ -12,7 +12,7 @@ public class Test {
 	private static String url="D:/image";
 	private static String saveUrl="D:/image/newimage/";
 	public static void main(String[] args) {
-<<<<<<< HEAD
+
 		IDPicDeal test=new IDPicDeal();
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);  
 	    File dir = new File(url);
@@ -23,7 +23,7 @@ public class Test {
 			@Override
 			//重写文件判断方法 只读取后缀为.jpg的照片
 			public boolean accept(File dir, String name) {
-				if (name.length()>4&&name.substring(name.length()-4, name.length()).equalsIgnoreCase(".jpg")) {
+				if ((name.length()>4&&name.substring(name.length()-4, name.length()).equalsIgnoreCase(".jpg"))||(name.length()>4&&name.substring(name.length()-4, name.length()).equalsIgnoreCase(".png"))) {
 					return true;
 				}
 				return false;
@@ -74,12 +74,9 @@ public class Test {
 				test.setBGC(file,saveUrl);
 			}
 
-		}
+		
+		//new BeautyFace().run()
+		//IDPicDeal idPicCut=new IDPicDeal();
 		//new BeautyFace().run();
-	
-=======
-		IDPicCut idPicCut=new IDPicCut();
-		new BeautyFace().run();
 	}
->>>>>>> 8c9dec95621728ed42bc64cfd89ad4b9fdc31a99
 }

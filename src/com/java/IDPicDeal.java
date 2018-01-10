@@ -37,7 +37,7 @@ public class IDPicDeal {
 	}
 	public  Mat face(Mat image) {  
 	    Mat dst = new Mat();  
-	    // int value1 = 3, value2 = 1; 磨皮程度与细节程度的确定  
+	    //  磨皮程度与细节程度的确定  
 	    int value1 = 3, value2 = 3;   
 	    int dx = value1 * 5; // 双边滤波参数之一  
 	    double fc = value1 * 12.5; // 双边滤波参数之一  
@@ -50,7 +50,6 @@ public class IDPicDeal {
 	    // temp2 = (temp1 - image + 128);  
 	    Mat temp22 = new Mat();  
 	    Core.subtract(temp1, image, temp22);  
-	    // Core.subtract(temp22, new Scalar(128), temp2);  
 	    Core.add(temp22, new Scalar(128, 128, 128, 128), temp2);  
 	    // 高斯模糊  
 	    Imgproc.GaussianBlur(temp2, temp3, new Size(2 * value2 - 1, 2 * value2 - 1), 0, 0);  
@@ -84,7 +83,7 @@ public class IDPicDeal {
 	 * @param file 传入照片文件进行图像换底色
 	 * @param url 保存路径
 	 */
-	public void setBGC(File image,String url) {
+	public void setBGC(File image,String url,int color) {
         BufferedImage bi = null;  
         try {  
             /** 
@@ -123,7 +122,8 @@ public class IDPicDeal {
          * 中间-》左
          */
         
-        for (int i = (int)width/2; i>=minx; i--) {
+
+		for (int i = (int)width/2; i>=minx; i--) {
         	temp=0;
             for (int j = miny; j < height; j++) { 
             	if (j-bfHeiht>100) {//当前的j比之前的j相差范围过大就表示走到了脸的最左侧
@@ -135,7 +135,7 @@ public class IDPicDeal {
 				}
             	//&&(((i<width/2&&j<leftHeight)||(i>width/2&&j>rightHeight)))
                 if(isWhite(bi,i,j)){
-                		bi.setRGB(i, j, 0x0066CC);
+                		bi.setRGB(i, j, color);
                 		temp=j;
                 }
             }
@@ -161,7 +161,7 @@ public class IDPicDeal {
 				}
             	//&&(((i<width/2&&j<leftHeight)||(i>width/2&&j>rightHeight)))
                 if(isWhite(bi,i,j)){
-                		bi.setRGB(i, j, 0x0066CC);
+                		bi.setRGB(i, j, color);
                 		temp=j;
                 }
             }
@@ -180,7 +180,7 @@ public class IDPicDeal {
 				}
                 if(isWhite(bi,j,i)&&i<leftHeight){
                 	flage++;
-                	bi.setRGB(j, i, 0x0066CC);
+                	bi.setRGB(j, i, color);
                 	temp=j;
                 }
                                   
@@ -197,7 +197,7 @@ public class IDPicDeal {
 				} 
                 if(isWhite(bi,j,i)&&i<rightHeight){
                 	flage++;
-                	bi.setRGB(j, i, 0x0066CC);
+                	bi.setRGB(j, i, color);
                 	temp=j;
                 }
                                  
