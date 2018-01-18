@@ -87,7 +87,7 @@ public class UI {
 		frame = new JFrame();
 		frame.setTitle("图片批量处理软件");
 		frame.getContentPane().setLayout(null);
-		IDPicDeal idPicDeal = new IDPicDeal();//
+		IDPicDeal idPicDeal = new IDPicDeal();
 
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		tabbedPane.setBounds(10, 76, 478, 364);
@@ -127,6 +127,7 @@ public class UI {
 		panel_3.add(button_5);
 
 		JTextPane textPane_4 = new JTextPane();
+		textPane_4.setEditable(false);
 		textPane_4.setText("说明：\r\n把图片文件夹里的图片进行人脸识别，裁剪后放到选定的保存路径下");
 		textPane_4.setBounds(28, 26, 393, 56);
 		panel_3.add(textPane_4);
@@ -143,11 +144,11 @@ public class UI {
 
 		JComboBox comboBox = new JComboBox();
 		comboBox.setModel(new DefaultComboBoxModel(new String[] { "", "蓝", "红", "白" }));
-		comboBox.setBounds(108, 72, 46, 23);
+		comboBox.setBounds(106, 87, 46, 23);
 		panel.add(comboBox);
 
 		JLabel label_2 = new JLabel("修改底色");
-		label_2.setBounds(41, 76, 54, 15);
+		label_2.setBounds(39, 91, 54, 15);
 		panel.add(label_2);
 
 		JLabel label_3 = new JLabel("人脸磨皮");
@@ -164,8 +165,8 @@ public class UI {
 		panel.add(button_2);
 
 		JTextPane textPane_5 = new JTextPane();
-		textPane_5.setText("说明：\r\n操作的对象为保存路径下的图片，修改完后覆盖原来的图片");
-		textPane_5.setBounds(29, 25, 368, 41);
+		textPane_5.setText("说明：\r\n操作的对象为保存路径下的图片，修改完后覆盖原来的图片\r\n修改底色（要求原图为白色或灰白色底，并且衣服颜色和背景颜色不能接近）\r\n人脸磨皮，如果达不到要求可以尝试运行多次");
+		textPane_5.setBounds(10, 6, 444, 71);
 		panel.add(textPane_5);
 		// 证件照处理
 		button_2.addActionListener(new ActionListener() {
@@ -192,7 +193,7 @@ public class UI {
 						count++;
 						if (isBeauty) {
 							output("对图片" + file.getName() + "进行磨皮", textPane);
-							idPicDeal.beautFace(file);
+							idPicDeal.beautyFace(file);
 							output("图片" + file.getName() + "磨皮完成", textPane);
 						}
 						if (color != 0) {

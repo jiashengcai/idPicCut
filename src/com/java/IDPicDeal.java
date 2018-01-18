@@ -28,60 +28,45 @@ public class IDPicDeal {
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 	}
 
-	/**
-	 * 添加水印
-	 * 
-	 */
-	public void setWater(String str, File image) {
-		int width = str.length() * 20;
-		int height = 20;
-		BufferedImage temp = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-		Graphics2D g2d = temp.createGraphics();
-		g2d.drawString(str, 0, 0);
-		try {
-			Thumbnails.of(image).scale(1f).watermark(Positions.CENTER, temp, 0.5f)
-					.outputQuality(1f).toFile(image);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-	}
 
 	/**
-	 * 人脸美化
+	 * 人脸磨皮
 	 */
-	public void beautFace(File image) {
+	public void beautyFace(File image) {
 
 		Mat src2 = Highgui.imread(image.getPath());
 		Mat src3 = face(src2);
-		Mat dest = new Mat(new Size(src2.cols() + src3.cols(), src2.rows()), src2.type());
-		Mat temp1 = dest.colRange(0, src2.cols());
-		Mat temp2 = dest.colRange(src2.cols(), dest.cols());
-		src2.copyTo(temp1);
-		// src3.copyTo(temp2);
 		Highgui.imwrite(image.getPath(), src3);
 	}
 
 	public Mat face(Mat image) {
+		//Dest =(Src * (100 - Opacity) + (Src + 2 * GuassBlur(EPFFilter(Src) - Src + 128) - 256) * Opacity) /100 
 		Mat dst = new Mat();
 		// 磨皮程度与细节程度的确定
 		int value1 = 3, value2 = 3;
 		int dx = value1 * 5; // 双边滤波参数之一
 		double fc = value1 * 12.5; // 双边滤波参数之一
-		double p = 0.1f; // 透明度
+		double opacity = 0.1f; // 透明度
 		Mat temp1 = new Mat(), temp2 = new Mat(), temp3 = new Mat(), temp4 = new Mat();
 		// 双边滤波
 		Imgproc.bilateralFilter(image, temp1, dx, fc, fc);
+		// temp2 = (temp1 - image + 128);
 		Mat temp22 = new Mat();
 		Core.subtract(temp1, image, temp22);
+		
 		Core.add(temp22, new Scalar(128, 128, 128, 128), temp2);
 		// 高斯模糊
 		Imgproc.GaussianBlur(temp2, temp3, new Size(2 * value2 - 1, 2 * value2 - 1), 0, 0);
+		
+		// temp4 = image + 2 * temp3 - 256;
 		Mat temp44 = new Mat();
-		temp3.convertTo(temp44, temp3.type(), 2, -255);
+		temp3.convertTo(temp44, temp3.type(), 2, -256);
 		Core.add(image, temp44, temp4);
-		Core.addWeighted(image, p, temp4, 1 - p, 0.0, dst);
+		/**
+		 * dst = (image*(100 - opacity) + temp4*opacity) / 100;
+		 * dst = (image*(1 - opacity) + temp4*opacity) / 1;
+		 */
+		Core.addWeighted(image, opacity, temp4, 1 - opacity, 0.0, dst);
 		Core.add(dst, new Scalar(10, 10, 10), dst);
 		return dst;
 	}
@@ -89,16 +74,17 @@ public class IDPicDeal {
 	/**
 	 * 压缩图片
 	 * 
-	 * @param file
-	 *            图片文件
-	 * @param size
-	 *            压缩比例
+	 * @param file 图片文件
+	 * @param size 压缩比例
+	 * @param w 宽度
+	 * @param h 高度 
 	 */
 	public void smartData(File file, Float size, int w, int h) {
-		try {
+		try {//修改图片尺寸
 			if (w != 0 && h != 0) {
 				Thumbnails.of(file).size(w, h).keepAspectRatio(true).toFile(file);
 			}
+			//压缩
 			Thumbnails.of(file).scale(1f).outputQuality(size).toFile(file);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -143,54 +129,6 @@ public class IDPicDeal {
 		for (int i = 0; i < height; i++) {
 			if (isWhite(bi, width - 1, i)) {
 				rightHeight = i;
-			}
-		}
-		/**
-		 * 从上到下 中间-》左
-		 */
-
-		for (int i = (int) width / 2; i >= minx; i--) {
-			temp = 0;
-			for (int j = miny; j < height; j++) {
-				if (j - bfHeiht > 100) {// 当前的j比之前的j相差范围过大就表示走到了脸的最左侧
-					f = true;
-				}
-				if (j - temp > 5) { // 如果当前的j和同一竖线下的前一个j不连续而且相差大于5就表示以及到达边缘了
-					bfHeiht = j;
-					break;
-				}
-				if (isWhite(bi, i, j)) {
-					bi.setRGB(i, j, color);
-					temp = j;
-				}
-			}
-			if (f) {// 如果脸的最右侧就退出
-				f = false;
-				break;
-			}
-		}
-		/**
-		 * 上-》下 中-》右
-		 */
-		bfHeiht = 0;
-		for (int i = (int) width / 2; i < width; i++) {
-			temp = 0;
-			for (int j = miny; j < height; j++) {
-				if (j - bfHeiht > 100) {// 当前的j比之前的j相差范围过大就表示走到了脸的最左侧
-					f = true;
-				}
-				if (j - temp > 5) { // 如果当前的j和同一竖线下的前一个j不连续而且相差大于5就表示以及到达边缘了
-					bfHeiht = j;
-					break;
-				}
-				if (isWhite(bi, i, j)) {
-					bi.setRGB(i, j, color);
-					temp = j;
-				}
-			}
-			if (f) {// 如果脸的最右侧就退出
-				f = false;
-				break;
 			}
 		}
 		// 从左往右
@@ -271,7 +209,6 @@ public class IDPicDeal {
 
 	/**
 	 * 传入照片文件 对图像进行人脸识别剪切
-	 * 
 	 * @param file
 	 */
 	public void dealImage(File file, String savUrl) {
@@ -309,7 +246,6 @@ public class IDPicDeal {
 		}
 		return MaxRect;
 	}
-
 	/**
 	 * 构造人脸识别器
 	 * 
